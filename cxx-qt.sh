@@ -1,0 +1,13 @@
+bazel run //:cxxqtcmd -- \
+  --out-dir $(pwd)/target/tmp/cxx-qt \
+  --qmake $(which qmake) \
+  --host-triple aarch64-apple-darwin \
+  --target-triple aarch64-apple-darwin \
+  --opt-level 3 \
+  --file $CXX_QT_ROOT/crates/cxx-qt/src/connection.rs \
+  --file $CXX_QT_ROOT/crates/cxx-qt/src/qobject.rs \
+  --crate-directory $CXX_QT_ROOT/crates/cxx-qt \
+  --crate-include-root include \
+  --cpp-file $CXX_QT_ROOT/crates/cxx-qt/src/connection.cpp \
+  --crate-name cxx-qt \
+  --initializer "init_cxx_qt_core;$CXX_QT_ROOT/crates/cxx-qt/src/init.cpp"
