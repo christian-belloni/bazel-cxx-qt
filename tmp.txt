@@ -1,0 +1,21 @@
+
+
+
+
+
+
+
+
+
+
+
+
+Args { initializer: ["init_cxx_qt_core;/Users/christianbelloni/work/oss/cxx-qt/crates/cxx-qt/src/init.cpp"], file: ["src/connection.rs", "src/qobject.rs"], crate_include_root: Some("include
+"), include_dir: [], include_prefix: None, qrc: [], qt_module: [], cpp_file: ["src/connection.cpp"], out_dir: "/Users/christianbelloni/work/oss/bazel-cxx-qt/target/tmp/cxx-qt", qmake: "/opt
+/homebrew/bin/qmake", host_triple: "aarch64-apple-darwin", target_triple: "aarch64-apple-darwin", opt_level: 3, crate_directory: "/Users/christianbelloni/work/oss/cxx-qt/crates/cxx-qt", cra
+te_name: "cxx-qt", cargo_manifest_links: None, extra_header_file: None, extra_header_line: [], cxxqt_dependency: [], command: None }
+
+Args { initializer: ["init_cxx_qt_core;external/rules_rs++crate+crates__cxx-qt-0.10.0/src/init.cpp"], file: ["src/connection.rs", "src/qobject.rs"], crate_include_root: Some("include"), inc
+lude_dir: [], include_prefix: None, qrc: [], qt_module: [], cpp_file: ["src/connection.cpp"], out_dir: "bazel-out/darwin_arm64-fastbuild/bin/external/rules_rs++crate+crates__cxx-qt-0.10.0/o
+ut", qmake: "/opt/homebrew/bin/qmake", host_triple: "aarch64-apple-darwin", target_triple: "aarch64-apple-darwin", opt_level: 3, crate_directory: "external/rules_rs++crate+crates__cxx-qt-0.
+10.0", crate_name: "cxx-qt", cargo_manifest_links: None, extra_header_file: None, extra_header_line: [], cxxqt_dependency: [], command: None }

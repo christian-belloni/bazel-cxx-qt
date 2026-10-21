@@ -1,9 +1,9 @@
-
+OUT_DIR="$(pwd)/target/tmp/cxx-qt-lib"
 
 bazel run //:cxxqtcmd -- \
   --initializer "init_cxx_qt_lib_core;$CXX_QT_ROOT/crates/cxx-qt-lib/src/core/init.cpp" \
   --initializer "init_cxx_qt_lib_gui;$CXX_QT_ROOT/crates/cxx-qt-lib/src/gui/init.cpp" \
-  --out-dir $(pwd)/target/tmp/cxx-qt-lib \
+  --out-dir $OUT_DIR \
   --qmake $(which qmake) \
   --host-triple aarch64-apple-darwin \
   --target-triple aarch64-apple-darwin \
@@ -12,9 +12,8 @@ bazel run //:cxxqtcmd -- \
   --crate-directory $CXX_QT_ROOT/crates/cxx-qt-lib \
   --crate-include-root include \
   --crate-name cxx-qt-lib \
-  --include-dir $(pwd)/target/tmp/cxx-qt-lib/include/cxx-qt-lib \
   --cxxqt-dependency $(pwd)/target/tmp/cxx-qt/cxxqtbuild/include \
-  --extra-header-file $(pwd)/target/tmp/cxx-qt-lib/include/cxx-qt-lib/definitions.h \
+  --extra-header-file $OUT_DIR/include/cxx-qt-lib/definitions.h \
   --extra-header-line "#define CXX_QT_GUI_FEATURE" \
   --extra-header-line "#define CXX_QT_QML_FEATURE" \
   --extra-header-line "#define CXX_QT_QUICKCONTROLS_FEATURE" \
@@ -267,4 +266,5 @@ bazel run //:cxxqtcmd -- \
   --cpp-file $CXX_QT_ROOT/crates/cxx-qt-lib/src/qml/qqmlimageproviderbase.cpp \
   --qt-module Gui \
   --qt-module Qml \
-  --qt-module QuickControls2
+  --qt-module QuickControls2 \
+  export

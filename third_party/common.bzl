@@ -1,0 +1,355 @@
+load("@bazel-cxx-qt//:rules.bzl", "cxx_qt_cmd")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+bridge_core_files = [
+  "src/core/qdatetime.rs",
+  "src/core/qtimezone.rs",
+  "src/core/qlist/qlist_qdatetime.rs",
+  "src/core/qset/qset_qdatetime.rs",
+  "src/core/qvariant/qvariant_qdatetime.rs",
+  "src/core/qvector/qvector_qdatetime.rs",
+  "src/core/qbytearray.rs",
+  "src/core/qanystringview.rs",
+  "src/core/qmetatype/qmetatypetype_v6.rs",
+  "src/core/qcoreapplication.rs",
+  "src/core/qdate.rs",
+  "src/core/qhash/qhash_i32_qbytearray.rs",
+  "src/core/qhash/qhash_qstring_qvariant.rs",
+  "src/core/qjsonarray.rs",
+  "src/core/qjsonobject.rs",
+  "src/core/qjsonvalue.rs",
+  "src/core/qline.rs",
+  "src/core/qlinef.rs",
+  "src/core/qlist/qlist_bool.rs",
+  "src/core/qlist/qlist_f32.rs",
+  "src/core/qlist/qlist_f64.rs",
+  "src/core/qlist/qlist_i8.rs",
+  "src/core/qlist/qlist_i16.rs",
+  "src/core/qlist/qlist_i32.rs",
+  "src/core/qlist/qlist_i64.rs",
+  "src/core/qlist/qlist_qbytearray.rs",
+  "src/core/qlist/qlist_qdate.rs",
+  "src/core/qlist/qlist_qline.rs",
+  "src/core/qlist/qlist_qlinef.rs",
+  "src/core/qlist/qlist_qmargins.rs",
+  "src/core/qlist/qlist_qmarginsf.rs",
+  "src/core/qlist/qlist_qobjectmutptr.rs",
+  "src/core/qlist/qlist_qpersistentmodelindex.rs",
+  "src/core/qlist/qlist_qpoint.rs",
+  "src/core/qlist/qlist_qpointf.rs",
+  "src/core/qlist/qlist_qrect.rs",
+  "src/core/qlist/qlist_qrectf.rs",
+  "src/core/qlist/qlist_qsize.rs",
+  "src/core/qlist/qlist_qsizef.rs",
+  "src/core/qlist/qlist_qstring.rs",
+  "src/core/qlist/qlist_qtime.rs",
+  "src/core/qlist/qlist_qurl.rs",
+  "src/core/qlist/qlist_quuid.rs",
+  "src/core/qlist/qlist_qvariant.rs",
+  "src/core/qlist/qlist_u8.rs",
+  "src/core/qlist/qlist_u16.rs",
+  "src/core/qlist/qlist_u32.rs",
+  "src/core/qlist/qlist_u64.rs",
+  "src/core/qmap/qmap_qstring_qvariant.rs",
+  "src/core/qmargins.rs",
+  "src/core/qmarginsf.rs",
+  "src/core/qmodelindex.rs",
+  "src/core/qobject.rs",
+  "src/core/qpersistentmodelindex.rs",
+  "src/core/qpoint.rs",
+  "src/core/qpointf.rs",
+  "src/core/qrect.rs",
+  "src/core/qrectf.rs",
+  "src/core/qset/qset_bool.rs",
+  "src/core/qset/qset_f32.rs",
+  "src/core/qset/qset_f64.rs",
+  "src/core/qset/qset_i8.rs",
+  "src/core/qset/qset_i16.rs",
+  "src/core/qset/qset_i32.rs",
+  "src/core/qset/qset_i64.rs",
+  "src/core/qset/qset_qbytearray.rs",
+  "src/core/qset/qset_qdate.rs",
+  "src/core/qset/qset_qpersistentmodelindex.rs",
+  "src/core/qset/qset_qstring.rs",
+  "src/core/qset/qset_qtime.rs",
+  "src/core/qset/qset_qurl.rs",
+  "src/core/qset/qset_quuid.rs",
+  "src/core/qset/qset_u8.rs",
+  "src/core/qset/qset_u16.rs",
+  "src/core/qset/qset_u32.rs",
+  "src/core/qset/qset_u64.rs",
+  "src/core/qsize.rs",
+  "src/core/qsizef.rs",
+  "src/core/qstring.rs",
+  "src/core/qstringlist.rs",
+  "src/core/qt.rs",
+  "src/core/qtime.rs",
+  "src/core/qtlogging.rs",
+  "src/core/qtypes.rs",
+  "src/core/qurl.rs",
+  "src/core/quuid.rs",
+  "src/core/qvariant/mod.rs",
+  "src/core/qvariant/qvariant_bool.rs",
+  "src/core/qvariant/qvariant_f32.rs",
+  "src/core/qvariant/qvariant_f64.rs",
+  "src/core/qvariant/qvariant_i8.rs",
+  "src/core/qvariant/qvariant_i16.rs",
+  "src/core/qvariant/qvariant_i32.rs",
+  "src/core/qvariant/qvariant_i64.rs",
+  "src/core/qvariant/qvariant_qbytearray.rs",
+  "src/core/qvariant/qvariant_qdate.rs",
+  "src/core/qvariant/qvariant_qjsonarray.rs",
+  "src/core/qvariant/qvariant_qjsonobject.rs",
+  "src/core/qvariant/qvariant_qjsonvalue.rs",
+  "src/core/qvariant/qvariant_qline.rs",
+  "src/core/qvariant/qvariant_qlinef.rs",
+  "src/core/qvariant/qvariant_qlist_bool.rs",
+  "src/core/qvariant/qvariant_qlist_f32.rs",
+  "src/core/qvariant/qvariant_qlist_f64.rs",
+  "src/core/qvariant/qvariant_qlist_i16.rs",
+  "src/core/qvariant/qvariant_qlist_i32.rs",
+  "src/core/qvariant/qvariant_qlist_i64.rs",
+  "src/core/qvariant/qvariant_qlist_i8.rs",
+  "src/core/qvariant/qvariant_qlist_qobjectmutptr.rs",
+  "src/core/qvariant/qvariant_qlist_qstring.rs",
+  "src/core/qvariant/qvariant_qlist_u16.rs",
+  "src/core/qvariant/qvariant_qlist_u32.rs",
+  "src/core/qvariant/qvariant_qlist_u64.rs",
+  "src/core/qvariant/qvariant_qlist_u8.rs",
+  "src/core/qvariant/qvariant_qmodelindex.rs",
+  "src/core/qvariant/qvariant_qobjectmutptr.rs",
+  "src/core/qvariant/qvariant_qpersistentmodelindex.rs",
+  "src/core/qvariant/qvariant_qpoint.rs",
+  "src/core/qvariant/qvariant_qpointf.rs",
+  "src/core/qvariant/qvariant_qrect.rs",
+  "src/core/qvariant/qvariant_qrectf.rs",
+  "src/core/qvariant/qvariant_qsize.rs",
+  "src/core/qvariant/qvariant_qsizef.rs",
+  "src/core/qvariant/qvariant_qstring.rs",
+  "src/core/qvariant/qvariant_qstringlist.rs",
+  "src/core/qvariant/qvariant_qtime.rs",
+  "src/core/qvariant/qvariant_qurl.rs",
+  "src/core/qvariant/qvariant_quuid.rs",
+  "src/core/qvariant/qvariant_qvarianthash.rs",
+  "src/core/qvariant/qvariant_qvariantlist.rs",
+  "src/core/qvariant/qvariant_qvariantmap.rs",
+  "src/core/qvariant/qvariant_u8.rs",
+  "src/core/qvariant/qvariant_u16.rs",
+  "src/core/qvariant/qvariant_u32.rs",
+  "src/core/qvariant/qvariant_u64.rs",
+  "src/core/qvector/qvector_bool.rs",
+  "src/core/qvector/qvector_f32.rs",
+  "src/core/qvector/qvector_f64.rs",
+  "src/core/qvector/qvector_i8.rs",
+  "src/core/qvector/qvector_i16.rs",
+  "src/core/qvector/qvector_i32.rs",
+  "src/core/qvector/qvector_i64.rs",
+  "src/core/qvector/qvector_qbytearray.rs",
+  "src/core/qvector/qvector_qdate.rs",
+  "src/core/qvector/qvector_qline.rs",
+  "src/core/qvector/qvector_qlinef.rs",
+  "src/core/qvector/qvector_qmargins.rs",
+  "src/core/qvector/qvector_qmarginsf.rs",
+  "src/core/qvector/qvector_qpersistentmodelindex.rs",
+  "src/core/qvector/qvector_qpoint.rs",
+  "src/core/qvector/qvector_qpointf.rs",
+  "src/core/qvector/qvector_qrect.rs",
+  "src/core/qvector/qvector_qrectf.rs",
+  "src/core/qvector/qvector_qsize.rs",
+  "src/core/qvector/qvector_qsizef.rs",
+  "src/core/qvector/qvector_qstring.rs",
+  "src/core/qvector/qvector_qtime.rs",
+  "src/core/qvector/qvector_qurl.rs",
+  "src/core/qvector/qvector_quuid.rs",
+  "src/core/qvector/qvector_qvariant.rs",
+  "src/core/qvector/qvector_u8.rs",
+  "src/core/qvector/qvector_u16.rs",
+  "src/core/qvector/qvector_u32.rs",
+  "src/core/qvector/qvector_u64.rs",
+  "src/core/qlist/qlist_qcolor.rs",
+  "src/core/qvariant/qvariant_qcolor.rs",
+  "src/core/qvariant/qvariant_qfont.rs",
+  "src/core/qvariant/qvariant_qimage.rs",
+  "src/core/qvariant/qvariant_qpen.rs",
+  "src/core/qvariant/qvariant_qpolygon.rs",
+  "src/core/qvariant/qvariant_qpolygonf.rs",
+  "src/core/qvariant/qvariant_qquaternion.rs",
+  "src/core/qvariant/qvariant_qregion.rs",
+  "src/core/qvariant/qvariant_qvector2d.rs",
+  "src/core/qvariant/qvariant_qvector3d.rs",
+  "src/core/qvariant/qvariant_qvector4d.rs",
+  "src/core/qvector/qvector_qcolor.rs",
+]
+
+bridge_gui_files = [
+  "src/gui/qcolor.rs",
+  "src/gui/qfont.rs",
+  "src/gui/qguiapplication.rs",
+  "src/gui/qimage.rs",
+  "src/gui/qquaternion.rs",
+  "src/gui/qpainterpath.rs",
+  "src/gui/qpainter.rs",
+  "src/gui/qpen.rs",
+  "src/gui/qpolygon.rs",
+  "src/gui/qpolygonf.rs",
+  "src/gui/qregion.rs",
+  "src/gui/qvector2d.rs",
+  "src/gui/qvector3d.rs",
+  "src/gui/qvector4d.rs",
+]
+
+bridge_qml_files = [
+  "src/qml/qqmlapplicationengine.rs",
+  "src/qml/qqmlengine.rs",
+  "src/qml/qqmlimageproviderbase.rs",
+  "src/quickcontrols/qquickstyle.rs",
+]
+
+cpp_core_files = [
+  "src/core/qbytearray.cpp",
+  "src/core/qcoreapplication.cpp",
+  "src/core/qdate.cpp",
+  "src/core/qhash/qhash.cpp",
+  "src/core/qjsonarray.cpp",
+  "src/core/qjsonobject.cpp",
+  "src/core/qjsonvalue.cpp",
+  "src/core/qline.cpp",
+  "src/core/qlinef.cpp",
+  "src/core/qlist/qlist.cpp",
+  "src/core/qmap/qmap.cpp",
+  "src/core/qmargins.cpp",
+  "src/core/qmarginsf.cpp",
+  "src/core/qmodelindex.cpp",
+  "src/core/qpersistentmodelindex.cpp",
+  "src/core/qpoint.cpp",
+  "src/core/qpointf.cpp",
+  "src/core/qrect.cpp",
+  "src/core/qrectf.cpp",
+  "src/core/qset/qset.cpp",
+  "src/core/qsize.cpp",
+  "src/core/qsizef.cpp",
+  "src/core/qstring.cpp",
+  "src/core/qstringlist.cpp",
+  "src/core/qtime.cpp",
+  "src/core/qtlogging.cpp",
+  "src/core/qtypes.cpp",
+  "src/core/qurl.cpp",
+  "src/core/quuid.cpp",
+  "src/core/qvariant/qvariant.cpp",
+  "src/core/qvector/qvector.cpp",
+  "src/core/qdatetime.cpp",
+  "src/core/qtimezone.cpp",
+  "src/qt_types.cpp",
+]
+
+cpp_gui_files = [
+  "src/gui/qcolor.cpp",
+  "src/gui/qfont.cpp",
+  "src/gui/qgenericmatrix.cpp",
+  "src/gui/qguiapplication.cpp",
+  "src/gui/qimage.cpp",
+  "src/gui/qpainterpath.cpp",
+  "src/gui/qpainter.cpp",
+  "src/gui/qpen.cpp",
+  "src/gui/qpolygon.cpp",
+  "src/gui/qpolygonf.cpp",
+  "src/gui/qquaternion.cpp",
+  "src/gui/qregion.cpp",
+  "src/gui/qvector2d.cpp",
+  "src/gui/qvector3d.cpp",
+  "src/gui/qvector4d.cpp",
+]
+
+
+cpp_qml_files = [
+  "src/qml/qqmlapplicationengine.cpp",
+  "src/qml/qqmlengine.cpp",
+  "src/qml/qqmlimageproviderbase.cpp",
+]
+
+def cxx_qt_lib(*, name, features = [], cxx_qt, visibility = []):
+  bridge_files = []
+  bridge_files += bridge_core_files
+  cpp_files = []
+  cpp_files += cpp_core_files
+
+  qt_modules = ["Core"]
+  initializers = {
+      "init_cxx_qt_lib_core": "src/core/init.cpp",
+  }
+  extra_headers = []
+  linkopts = ["-F/opt/homebrew/lib", "-Wl", "-framework QtCore"]
+
+  if "gui" in features or "full" in features:
+    bridge_files += bridge_gui_files
+    cpp_files += cpp_gui_files
+    qt_modules.append("Gui")
+    initializers = initializers | {
+      "init_cxx_qt_lib_gui": "src/gui/init.cpp"
+    }
+    extra_headers.append("#define CXX_QT_GUI_FEATURE")
+    linkopts.append("-framework QtGui")
+
+  if "qml" in features or "full" in features:
+    bridge_files += bridge_qml_files
+    cpp_files += cpp_qml_files
+    qt_modules.append("Qml")
+    extra_headers.append("#define CXX_QT_QML_FEATURE")
+    linkopts.append("-framework QtQml")
+
+  if "quickcontrols" in features or "full" in features:
+    extra_headers.append("#define CXX_QT_QUICKCONTROLS_FEATURE")
+    qt_modules.append("QuickControls2")
+    linkopts.append("-framework QtQuick")
+
+  cxx_qt_cmd(
+    name = name,
+    crate_name = "cxx-qt-lib",
+    srcs = native.glob(["include/**", "src/**", "Cargo.toml"]),
+    cargo_toml = "Cargo.toml",
+    bridge_files = bridge_files,
+    cpp_files = cpp_files,
+    initializers = initializers,
+    cxxqt_dependency = [cxx_qt],
+    crate_include_root = "include",
+    crate_include_files = native.glob(["include/**"]),
+    include_prefix = "private",
+    extra_headers = {
+      "include/cxx-qt-lib/definitions.h": extra_headers,
+    },
+    qt_modules = qt_modules,
+    visibility = visibility,
+  )
+
+  cc_library(
+    name = name + "-generated",
+    srcs = [name],
+    visibility = visibility,
+    linkopts = linkopts,
+    linkstatic = True,
+  )
+
+
+def cxx_qt(*, name, visibility = []):
+  cxx_qt_cmd(
+    name = name,
+    crate_name = "cxx-qt",
+    srcs = native.glob(["include/**", "src/**", "Cargo.toml"]),
+    crate_include_root = "include",
+    crate_include_files = native.glob(["include/**"]),
+    cargo_toml = "Cargo.toml",
+    bridge_files = ["src/connection.rs", "src/qobject.rs"],
+    cpp_files = ["src/connection.cpp"],
+    initializers = {
+      "init_cxx_qt_core": "src/init.cpp"
+    },
+    visibility = visibility,
+  )
+  
+  cc_library(
+    name = name + "-generated",
+    srcs = [name],
+    linkopts = ["-F/opt/homebrew/lib", "-framework QtCore", "-Wl"],
+    linkstatic = True,
+    visibility = visibility,
+  )

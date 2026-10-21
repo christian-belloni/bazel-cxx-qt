@@ -6,4 +6,5 @@ rust_binary(
   name = "cxxqtcmd",
   srcs = ["src/main.rs"],
   deps = all_crate_deps(),
+  visibility = ["//visibility:public"]
 )

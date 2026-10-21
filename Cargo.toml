@@ -1,5 +1,5 @@
 [workspace]
-members = ["."]
+members = [".", "tests/basic"]
 resolver = "3"
 
 [package]
@@ -17,4 +17,4 @@ dircpy = "0.3.21"
 
 [dev-dependencies]
 cxx-qt = "0.10"
-cxx-qt-lib = "0.10"
+cxx-qt-lib = { version = "0.10", features = ["full"] }

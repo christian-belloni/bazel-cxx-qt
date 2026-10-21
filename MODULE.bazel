@@ -1,6 +1,12 @@
+module(name = "bazel-cxx-qt")
+
+bazel_dep(name = "bazel_skylib", version = "1.9.2")
 bazel_dep(name = "rules_rs", version = "0.1.0")
 bazel_dep(name = "llvm", version = "0.8.25")
 bazel_dep(name = "platforms", version = "1.1.0")
+bazel_dep(name = "rules_cc", version = "0.2.26")
+bazel_dep(name = "cxx.rs", version = "1.0.205")
+
 
 toolchains = use_extension("@rules_rs//rs/toolchains:module_extension.bzl", "toolchains", dev_dependency = True)
 toolchains.toolchain(
@@ -30,5 +36,41 @@ crate.from_cargo(
     ],
 )
 use_repo(crate, "crates")
+
+crate.annotation(
+  crate = "cxx-qt",
+  additive_build_file = "//third_party:cxx-qt.additive.BUILD",
+  extra_aliased_targets = {
+    "_cxx-qt": "_cxx-qt",
+    "_cxx-qt-generated": "_cxx-qt-generated",
+  },
+  link_deps = ["@crates//:_cxx-qt-generated"],
+  rustc_flags = ["--cfg", "cxxqt_qt_version_major=\"6\""],
+  gen_build_script = "off",
+)
+
+crate.annotation(
+  crate = "cxx-qt-lib",
+  additive_build_file = "//third_party:cxx-qt-lib.additive.BUILD",
+  extra_aliased_targets = {
+    "_cxx-qt-lib": "_cxx-qt-lib",
+    "_cxx-qt-lib-generated": "_cxx-qt-lib-generated",
+  },
+  link_deps = ["@crates//:_cxx-qt-lib-generated"],
+  rustc_flags = ["--cfg", "cxxqt_qt_version_major=\"6\""],
+  gen_build_script = "off",
+)
+
+crate.annotation(
+  crate = "cxx",
+  gen_build_script = "off",
+  additive_build_file = "//third_party:cxx.additive.BUILD",
+  extra_aliased_targets = {
+    "_cc_lib": "_cc_lib",
+  },
+  link_deps = ["@crates//:_cc_lib"]
+)
+
+inject_repo(crate, "bazel-cxx-qt")
 
 
