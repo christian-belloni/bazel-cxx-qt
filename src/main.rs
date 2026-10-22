@@ -114,7 +114,7 @@ unsafe fn setup_env(args: &Args) {
 
         std::env::set_var("CXXFLAGS", current);
         std::env::set_var("OUT_DIR", out_dir);
-        std::env::set_var("QMAKE", &args.qmake);
+        std::env::set_var("QMAKE", args.qmake.canonicalize().unwrap());
         std::env::set_var("QT_VERSION_MAJOR", "6");
 
         std::fs::create_dir_all(&args.out_dir).unwrap();

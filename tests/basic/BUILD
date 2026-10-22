@@ -1,33 +1,21 @@
 load("@rules_rs//rs:rust_binary.bzl", "rust_binary")
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("@bazel-cxx-qt//:rules.bzl", "cxx_qt_cmd")
+load("@cxx-qt-bazel//cxx-qt-bazel:qml_module.bzl", "qml_module")
+load("@cxx_qt_crates//:defs.bzl", "all_crate_deps")
 
-cxx_qt_cmd(
-  name = "_bs",
-  srcs = glob(["**"]),
-  crate_name = "basic",
-  cargo_toml = "Cargo.toml",
-  # qmake = "@qt_osx//:qmake",
-  visibility = ["//visibility:public"],
-  qml_modules = {
-    "com.example.basic": ["qml/main.qml"],
-  },
-)
-
-cc_library(
+qml_module(
   name = "_gen",
-  srcs = [":_bs"],
-  alwayslink = True,
-  linkstatic = True,
+  crate_name = "basic",
+  module_name = "com.example.basic",
+  qml_files = ["qml/main.qml"],
 )
 
 rust_binary(
   name = "basic",
   srcs = ["src/main.rs"],
-  deps = [
-    "@crates//:cxx-qt",
-    "@crates//:cxx-qt-lib",
-    ":_gen"
+  deps = all_crate_deps() + [
+    ":_gen",
+    # we are using Quick in qml
+    "@qt//:QtQuick",
   ],
   alwayslink = True,
 )

@@ -1,27 +1,6 @@
 load("@rules_cc//cc:find_cc_toolchain.bzl", "use_cc_toolchain")#, "find_cc_toolchain")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-# load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
-# load("@rules_cc//cc:action_names.bzl", "C_COMPILE_ACTION_NAME")
-
-# bazel run //:cxxqtcmd -- \
-#   --out-dir $(pwd)/target/tmp/cxx-qt \
-#   --qmake $(which qmake) \
-#   --host-triple aarch64-apple-darwin \
-#   --target-triple aarch64-apple-darwin \
-#   --opt-level 3 \
-#   --file $CXX_QT_ROOT/crates/cxx-qt/src/connection.rs \
-#   --file $CXX_QT_ROOT/crates/cxx-qt/src/qobject.rs \
-#   --crate-directory $CXX_QT_ROOT/crates/cxx-qt \
-#   --crate-include-root include \
-#   --cpp-file $CXX_QT_ROOT/crates/cxx-qt/src/connection.cpp \
-#   --crate-name cxx-qt \
-#   --initializer "init_cxx_qt_core;$CXX_QT_ROOT/crates/cxx-qt/src/init.cpp"
-#
-#
-#   --extra-header-file $(pwd)/target/tmp/cxx-qt-lib/include/cxx-qt-lib/definitions.h \
-#   --extra-header-line "#define CXX_QT_GUI_FEATURE" \
-#   --extra-header-line "#define CXX_QT_QML_FEATURE" \
-#   --extra-header-line "#define CXX_QT_QUICKCONTROLS_FEATURE" \
+load("@bazel_skylib//rules/directory:providers.bzl", "DirectoryInfo")
 
 CxxQtInclude = provider("",
   fields = ["include"]
@@ -34,14 +13,18 @@ def _cxx_qt_cmd_impl(ctx):
   toml_dir = ctx.file.cargo_toml.dirname
   args = ctx.actions.args()
   out_dir = out_lib.dirname
+
+  qt = ctx.attr.qt[DirectoryInfo]
+
   args.add("--out-dir", out_dir)
-  args.add("--qmake", "/opt/homebrew/bin/qmake")
+  args.add("--qmake", "%s/bin/qmake" % qt.path)
   args.add("--host-triple", "aarch64-apple-darwin")
   args.add("--target-triple", "aarch64-apple-darwin")
   args.add("--opt-level", "3")
   args.add("--crate-directory", toml_dir)
   args.add("--crate-name", ctx.attr.crate_name)
-  args.add("--crate-include-root", ctx.attr.crate_include_root)
+  if ctx.attr.crate_include_root != "":
+    args.add("--crate-include-root", ctx.attr.crate_include_root)
 
   
   for bridge in ctx.files.bridge_files:
@@ -108,17 +91,29 @@ def _cxx_qt_cmd_impl(ctx):
 
   ctx.actions.run(
     outputs = [out_lib, init_lib, cxx_header] + extra_headers,
-    inputs = ctx.files.srcs + include_headers + additional_files,# + toolchain.all_files.to_list(),
+    inputs = ctx.files.srcs + include_headers + additional_files + qt.glob(["**"]).to_list(),# + toolchain.all_files.to_list(),
     executable = ctx.executable._tool,
     arguments = [args],
     env = {
       "CXXFLAGS": flags
-    }
+    },
   )
+
+  copied_extra_headers = []
+  for extra_header in extra_headers:
+    filename = extra_header.basename
+    new_file = ctx.actions.declare_file("headers/include/%s/%s" % (ctx.attr.crate_name, filename))
+    copied_extra_headers.append(new_file)
+    ctx.actions.run_shell(
+      command = "cp %s %s" % (extra_header.path, new_file.path),
+      inputs = [extra_header],
+      outputs = [new_file],
+    )
+    
 
   providers = [DefaultInfo(files = depset([out_lib, init_lib]))]
   if len(include_headers + extra_headers) != 0:
-    providers += [CxxQtInclude(include = depset(include_headers + extra_headers))]
+    providers += [CxxQtInclude(include = depset(include_headers + copied_extra_headers))]
 
   return providers
 
@@ -141,17 +136,43 @@ _cxx_qt_cmd = rule(
     "cxxqt_dependency": attr.label_list(providers = [CxxQtInclude]),
     "extra_headers": attr.string_list_dict(),
     "qml_modules": attr.string_list_dict(),
-    # "qmake": attr.label(allow_single_file = True, mandatory = True, executable = True, cfg = "exec"),
-    "_tool": attr.label(executable = True, cfg = "exec", default = Label("@bazel-cxx-qt//:cxxqtcmd"))
+    "qt": attr.label(providers = [DirectoryInfo]),
+    "_tool": attr.label(executable = True, cfg = "exec", default = Label("@cxx-qt-bazel//:cxxqtcmd"))
   },
   fragments = ["cpp"],
   toolchains = use_cc_toolchain()
 )
 
-def cxx_qt_cmd(*, name, visibility, **kwargs):
+
+def _extract_headers_impl(ctx):
+  include = ctx.attr.cxx_qt_cmd[CxxQtInclude]
+  return DefaultInfo(files = include.include)
+
+_extract_headers = rule(
+  implementation = _extract_headers_impl,
+  attrs = {
+    "cxx_qt_cmd": attr.label(providers = [CxxQtInclude])
+  }
+)
+
+def cxx_qt_cmd(*, name, visibility = [], **kwargs):
   _cxx_qt_cmd(name = name, visibility = visibility, **kwargs)
+  _extract_headers(
+    name = "%s-files" % name,
+    cxx_qt_cmd = name,
+    visibility = visibility,
+  )
+
+  cc_library(
+    name = "%s-hdrs" % name,
+    hdrs = ["%s-files" % name],
+    visibility = visibility,
+    strip_include_prefix = "headers/include"
+  )
+
   cc_library(
     name = "%s-cc" % name,
     srcs = [":%s" % name],
     visibility = visibility,
+    deps = ["%s-hdrs"]
   )

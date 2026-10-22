@@ -1,0 +1,12 @@
+crate = use_extension("@rules_rs//rs:extensions.bzl", "crate")
+
+crate.annotation(
+  crate = "cxx-qt-lib",
+  additive_build_file = "//third_party:qt.additive.BUILD",
+  extra_aliased_targets = {
+    "_bs_cxx-qt-lib-generated": "_bs_cxx-qt-lib-generated",
+  },
+  rustc_flags = ["--cfg", "cxxqt_qt_version_major=\"6\""],
+  gen_build_script = "off",
+  link_deps = ["@cxx_qt_crates//:_bs_cxx-qt-lib-generated"],
+)

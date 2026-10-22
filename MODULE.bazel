@@ -1,4 +1,4 @@
-module(name = "bazel-cxx-qt")
+module(name = "cxx-qt-bazel")
 
 bazel_dep(name = "bazel_skylib", version = "1.9.2")
 bazel_dep(name = "rules_rs", version = "0.1.0")
@@ -23,7 +23,7 @@ register_toolchains(
 
 crate = use_extension("@rules_rs//rs:extensions.bzl", "crate")
 crate.from_cargo(
-    name = "crates",
+    name = "cxx_qt_crates",
     cargo_lock = "//:Cargo.lock",
     cargo_toml = "//:Cargo.toml",
     platform_triples = [
@@ -35,42 +35,20 @@ crate.from_cargo(
         "x86_64-unknown-linux-gnu",
     ],
 )
-use_repo(crate, "crates")
 
-crate.annotation(
-  crate = "cxx-qt",
-  additive_build_file = "//third_party:cxx-qt.additive.BUILD",
-  extra_aliased_targets = {
-    "_cxx-qt": "_cxx-qt",
-    "_cxx-qt-generated": "_cxx-qt-generated",
-  },
-  link_deps = ["@crates//:_cxx-qt-generated"],
-  rustc_flags = ["--cfg", "cxxqt_qt_version_major=\"6\""],
-  gen_build_script = "off",
-)
+use_repo(crate, "cxx_qt_crates")
 
-crate.annotation(
-  crate = "cxx-qt-lib",
-  additive_build_file = "//third_party:cxx-qt-lib.additive.BUILD",
-  extra_aliased_targets = {
-    "_cxx-qt-lib": "_cxx-qt-lib",
-    "_cxx-qt-lib-generated": "_cxx-qt-lib-generated",
-  },
-  link_deps = ["@crates//:_cxx-qt-lib-generated"],
-  rustc_flags = ["--cfg", "cxxqt_qt_version_major=\"6\""],
-  gen_build_script = "off",
-)
+inject_repo(crate, "cxx-qt-bazel")
+inject_repo(crate, "qt")
+inject_repo(crate, "cxx.rs")
 
-crate.annotation(
-  crate = "cxx",
-  gen_build_script = "off",
-  additive_build_file = "//third_party:cxx.additive.BUILD",
-  extra_aliased_targets = {
-    "_cc_lib": "_cc_lib",
-  },
-  link_deps = ["@crates//:_cc_lib"]
-)
+include("//third_party:cxx.MODULE.bazel")
+include("//third_party:cxx-qt.MODULE.bazel")
+include("//third_party:cxx-qt-lib.MODULE.bazel")
+include("//third_party:qtbridge-type-lib.MODULE.bazel")
+include("//third_party:qtbridge-runtime.MODULE.bazel")
+include("//third_party:qtbridge-interfaces.MODULE.bazel")
 
-inject_repo(crate, "bazel-cxx-qt")
+qt_download = use_extension("@cxx-qt-bazel//cxx-qt-bazel:extensions.bzl", "qt_download")
 
-
+use_repo(qt_download, "qt")

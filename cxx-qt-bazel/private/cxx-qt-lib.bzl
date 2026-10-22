@@ -1,4 +1,4 @@
-load("@bazel-cxx-qt//:rules.bzl", "cxx_qt_cmd")
+load("@cxx-qt-bazel//cxx-qt-bazel:cmd.bzl", "cxx_qt_cmd")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 bridge_core_files = [
@@ -278,7 +278,7 @@ def cxx_qt_lib(*, name, features = [], cxx_qt, visibility = []):
       "init_cxx_qt_lib_core": "src/core/init.cpp",
   }
   extra_headers = []
-  linkopts = ["-F/opt/homebrew/lib", "-Wl", "-framework QtCore"]
+  linkopts = ["-F$(location @qt//:lib)", "-Wl", "-framework QtCore"]
 
   if "gui" in features or "full" in features:
     bridge_files += bridge_gui_files
@@ -305,19 +305,20 @@ def cxx_qt_lib(*, name, features = [], cxx_qt, visibility = []):
   cxx_qt_cmd(
     name = name,
     crate_name = "cxx-qt-lib",
-    srcs = native.glob(["include/**", "src/**", "Cargo.toml"]),
+    srcs = native.glob(["include/**", "src/**", "Cargo.toml"], allow_empty = True),
     cargo_toml = "Cargo.toml",
     bridge_files = bridge_files,
     cpp_files = cpp_files,
     initializers = initializers,
     cxxqt_dependency = [cxx_qt],
     crate_include_root = "include",
-    crate_include_files = native.glob(["include/**"]),
+    crate_include_files = native.glob(["include/**"], allow_empty = True),
     include_prefix = "private",
     extra_headers = {
       "include/cxx-qt-lib/definitions.h": extra_headers,
     },
     qt_modules = qt_modules,
+    qt = "@qt//:files",
     visibility = visibility,
   )
 
@@ -325,31 +326,8 @@ def cxx_qt_lib(*, name, features = [], cxx_qt, visibility = []):
     name = name + "-generated",
     srcs = [name],
     visibility = visibility,
+    additional_linker_inputs = ["@qt//:lib"],
     linkopts = linkopts,
     linkstatic = True,
-  )
-
-
-def cxx_qt(*, name, visibility = []):
-  cxx_qt_cmd(
-    name = name,
-    crate_name = "cxx-qt",
-    srcs = native.glob(["include/**", "src/**", "Cargo.toml"]),
-    crate_include_root = "include",
-    crate_include_files = native.glob(["include/**"]),
-    cargo_toml = "Cargo.toml",
-    bridge_files = ["src/connection.rs", "src/qobject.rs"],
-    cpp_files = ["src/connection.cpp"],
-    initializers = {
-      "init_cxx_qt_core": "src/init.cpp"
-    },
-    visibility = visibility,
-  )
-  
-  cc_library(
-    name = name + "-generated",
-    srcs = [name],
-    linkopts = ["-F/opt/homebrew/lib", "-framework QtCore", "-Wl"],
-    linkstatic = True,
-    visibility = visibility,
+    deps = [name + "-hdrs"],
   )

@@ -1,0 +1,11 @@
+crate = use_extension("@rules_rs//rs:extensions.bzl", "crate")
+
+crate.annotation(
+  crate = "qtbridge-interfaces",
+  gen_build_script = "off",
+  additive_build_file = "//third_party:qt.additive.BUILD",
+  extra_aliased_targets = {
+    "_bs_qtbridge_interfaces": "_bs_qtbridge_interfaces",
+  },
+  link_deps = ["@cxx_qt_crates//:_bs_qtbridge_interfaces"],
+)

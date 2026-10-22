@@ -3,7 +3,7 @@ members = [".", "tests/basic"]
 resolver = "3"
 
 [package]
-name = "bazel-cxx-qt"
+name = "cxx-qt-bazel"
 version = "0.1.0"
 edition = "2024"
 
@@ -18,3 +18,4 @@ dircpy = "0.3.21"
 [dev-dependencies]
 cxx-qt = "0.10"
 cxx-qt-lib = { version = "0.10", features = ["full"] }
+qtbridge = "0.3"
