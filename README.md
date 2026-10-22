@@ -1,5 +1,8 @@
 # CXX-QT-Bazel
 
+> [!WARNING]
+> this project is still a work in in progress, expect breaking changes
+
 cxx-qt-bazel is a wrapper on [cxx-qt](https://github.com/KDAB/cxx-qt) to enable bazel based projects to compile cxx-qt-\* crates and qtbridge-\* crates
 
 ## Supported platforms
