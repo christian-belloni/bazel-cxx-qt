@@ -3,9 +3,11 @@ bazel_dep(name = "rules_cc", version = "0.2.26")
 bazel_dep(name = "llvm", version = "0.8.25")
 
 bazel_dep(name = "cxx-qt-bazel")
-local_path_override(
+
+git_override(
   module_name = "cxx-qt-bazel",
-  path = "../"
+  remote = "https://github.com/christian-belloni/cxx-qt-bazel.git",
+  branch = "master"
 )
 
 toolchains = use_extension("@rules_rs//rs/toolchains:module_extension.bzl", "toolchains", dev_dependency = True)
