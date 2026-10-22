@@ -6,7 +6,9 @@ qml_module(
   name = "_gen",
   crate_name = "basic",
   module_name = "com.example.basic",
-  qml_files = ["qml/main.qml"],
+  qml_files = [
+    "qml/main.qml",
+  ],
 )
 
 rust_binary(

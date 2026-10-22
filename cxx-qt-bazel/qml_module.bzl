@@ -1,5 +1,7 @@
-load("@cxx-qt-bazel//cxx-qt-bazel:cmd.bzl", "cxx_qt_cmd")
+load("@cxx-qt-bazel//cxx-qt-bazel:generate.bzl", generate = "cxx_qt_cmd")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load(":generate.bzl", "extract_plugin_headers")
+
 
 def qml_module(
   *, 
@@ -10,8 +12,8 @@ def qml_module(
   visibility = [], 
   qt_files = "@qt//:files"
 ):
-  cxx_qt_cmd(
-    name = "_bs_" + name,
+  generate(
+    name = "_bs_gen" + name,
     srcs = native.glob(["**"]),
     crate_name = crate_name,
     cargo_toml = "Cargo.toml",
@@ -20,10 +22,27 @@ def qml_module(
       module_name: qml_files,
     },
   )
+
+  extract_plugin_headers(
+    name = "_hdrs_" + name,
+    cxx_qt_cmd = "_bs_gen" + name,
+  )
+
   cc_library(
     name = name,
-    srcs = [":_bs_" + name],
+    hdrs = ["_hdrs_" + name],
+    srcs = [":_bs_gen" + name],
     alwayslink = True,
     linkstatic = True,
     visibility = visibility,
+    includes = [
+      "out/moc",
+    ],
+    defines = ["QT_STATICPLUGIN"],
+    deps = [
+      "@qt//:QtCore",
+      "@qt//:QtQml", 
+      "@qt//:QtNetwork",
+      "@qt//:qt_hdrs"
+    ]
   )

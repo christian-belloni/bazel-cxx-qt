@@ -1,8 +1,7 @@
 load("@rules_cc//cc:find_cc_toolchain.bzl", "use_cc_toolchain")#, "find_cc_toolchain")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@bazel_skylib//rules/directory:providers.bzl", "DirectoryInfo")
-load(":providers.bzl", "CxxQtInclude")
-
+load(":providers.bzl", "CxxQtInclude", "CxxQtQmlPlugin")
 
 def _cxx_qt_cmd_impl(ctx):
   cxx_header = ctx.actions.declare_file("out/cxxqtbuild/include/rust/cxx.h")
@@ -93,18 +92,44 @@ def _cxx_qt_cmd_impl(ctx):
     for line in content:
       args.add("--extra-header-line", line)
 
+  moc_files = []
+  if len(ctx.attr.qml_modules) != 0:
+    moc_builtins = ctx.actions.declare_file("out/moc/moc_builtins.h.cpp")
+    builtins = ctx.actions.declare_file("out/builtins.h")
+    moc_files += [builtins, moc_builtins]
+
+
+
+  moc_plugin_headers = []
   for module_name, qml_files in ctx.attr.qml_modules.items():
     args.add("--new-qml-module", module_name)
+    public = ctx.actions.declare_file(
+      "out/cxx-qt-build/initializers/qml_module_%s/public-initializer.cpp" % module_name.replace(".", "_")
+    )
+    call = ctx.actions.declare_file(
+      "out/cxx-qt-build/initializers/qml_module_%s/call-initializers.cpp" % module_name.replace(".", "_")
+    )
+    mod = ctx.actions.declare_file("out/rcc/qml_module_resources_%s.cpp" % module_name.replace(".", "_"))
+    res = ctx.actions.declare_file("out/qt-build-utils/qml_plugin/%s_plugin.cpp" % module_name.replace(".", "_"))
+    moc_plugin = ctx.actions.declare_file("out/moc/moc_%s_plugin.cpp.cpp" % module_name.replace(".", "_"))
+    typeregister = ctx.actions.declare_file("out/qmltyperegistrar/%s_qmltyperegistration.cpp" % module_name.replace(".", "_"))
+
+    cachegen = ctx.actions.declare_file("out/qmlcachegen/%s/qmlcache_loader.cpp" % module_name.replace(".", "/"))
+    moc_files += [public, call, mod, res, typeregister, cachegen]
+    moc_plugin_headers.append(moc_plugin)
     for f in qml_files:
       args.add("--qml-file", f)
+      qml = ctx.actions.declare_file("out/qmlcachegen/%s/%s.cpp" % (module_name.replace(".", "/"), f.split("/").pop()))
+      moc_files.append(qml)
   
   args.add("generate")
 
   public_initializer = ctx.actions.declare_file("out/cxx-qt-build/initializers/crate_%s/public-initializer.cpp" % ctx.attr.crate_name.replace("-", "_"))
 
   initializer = ctx.actions.declare_file("out/cxx-qt-build/initializers/crate_%s/call-initializers.cpp" % ctx.attr.crate_name.replace("-", "_"))
+
   ctx.actions.run(
-    outputs = [cxx_header] + extra_headers + generated_headers + generated_cpps + [public_initializer, initializer],
+    outputs = [cxx_header] + extra_headers + generated_headers + generated_cpps + [public_initializer, initializer] + moc_files + moc_plugin_headers,
     inputs = ctx.files.srcs + include_headers + additional_files + qt.glob(["**"]).to_list(),# + toolchain.all_files.to_list(),
     executable = ctx.executable._tool,
     arguments = [args],
@@ -114,9 +139,9 @@ def _cxx_qt_cmd_impl(ctx):
     mnemonic = "CxxQtGenerate"
   )
 
-  files = [cxx_header] + include_headers + extra_headers + generated_headers + generated_cpps
+  files = [cxx_header] + include_headers + extra_headers + generated_headers + generated_cpps + moc_files
 
-  providers = [DefaultInfo(files = depset(files))]
+  providers = [DefaultInfo(files = depset(files)), CxxQtQmlPlugin(plugin_headers = depset(moc_plugin_headers))]
   if len(include_headers + extra_headers) != 0:
     providers += [CxxQtInclude(include = depset(include_headers ))]
 
@@ -160,25 +185,17 @@ _extract_headers = rule(
   }
 )
 
+def _extract_plugin_headers_impl(ctx):
+  include = ctx.attr.cxx_qt_cmd[CxxQtQmlPlugin]
+  return DefaultInfo(files = include.plugin_headers)
+
+extract_plugin_headers = rule(
+  implementation = _extract_plugin_headers_impl,
+  attrs = {
+    "cxx_qt_cmd": attr.label(providers = [CxxQtQmlPlugin])
+  }
+)
+
 def cxx_qt_cmd(*, name, visibility = [], **kwargs):
   _cxx_qt_cmd(name = name, visibility = visibility, **kwargs)
-  _extract_headers(
-    name = "%s-files" % name,
-    cxx_qt_cmd = name,
-    visibility = visibility,
-  )
-
-  cc_library(
-    name = "%s-hdrs" % name,
-    hdrs = ["%s-files" % name],
-    visibility = visibility,
-    strip_include_prefix = "headers/include"
-  )
-
-  cc_library(
-    name = "%s-cc" % name,
-    srcs = [":%s" % name],
-    visibility = visibility,
-    deps = ["%s-hdrs"],
-  )
  
