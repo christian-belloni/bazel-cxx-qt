@@ -17,5 +17,5 @@ rust_binary(
     # we are using Quick in qml
     "@qt//:QtQuick",
   ],
-  alwayslink = True,
+  # alwayslink = True,
 )

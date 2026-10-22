@@ -76,6 +76,39 @@ bazel run //:refresh_project -- $(pwd)/third_party
 include("//third_party:include.MODULE.bazel")
  ```
 
+## Compile Qml files
+
+cxx-qt-bazel exposes a rule to compile qml files into qml_modules that can be depended on with rust_(libraries/binaries) with a few caveats:
+
+ - qml_module must be in a `BUILD` file next to your crate's `Cargo.toml`
+ - crate_name must be the same as the library that depends on the qml module
+
+Example:
+
+```
+load("@rules_rs//rs:rust_binary.bzl", "rust_binary")
+load("@cxx-qt-bazel//cxx-qt-bazel:qml_module.bzl", "qml_module")
+
+qml_module(
+  name = "my_qml",
+  crate_name = "my-crate",
+  module_name = "com.my.module",
+  qml_files = [.. qml files ..],
+)
+
+rust_binary(
+  name = "my-crate",
+  srcs = [ .. ],
+  deps = [
+    ":my_qml",
+    # if you're using additional Qt modules depend on them here
+    "@qt//:QtQuick",
+    ...
+  ],
+)
+```
+
+
 ## How it works
 
 TODO!
