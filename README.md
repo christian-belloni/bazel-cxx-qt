@@ -30,8 +30,8 @@ qtbridge_project(
 )
  ```
 
-[!NOTE]
-crates_hub should match your crates hub name when defining your cargo dependencies
+> [!NOTE]
+> crates_hub should match your crates hub name when defining your cargo dependencies
 
 in this case the matching definition should look like this
 ```starlark
@@ -53,8 +53,8 @@ use_repo(crate, "crates")
 bazel run //:refresh_project -- $(pwd)/third_party
 ```
 
-[!NOTE]
-The "$pwd" is needed since bazel rules run from the bazel-bin directory, not the workspace directory
+> [!NOTE]
+> The "$pwd" is needed since bazel rules run from the bazel-bin directory, not the workspace directory
 
 ### Include the generated include.MODULE.bazel file in your main MODULE.bazel
 
