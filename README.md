@@ -2,6 +2,19 @@
 
 cxx-qt-bazel is a wrapper on [cxx-qt](https://github.com/KDAB/cxx-qt) to enable bazel based projects to compile cxx-qt-\* crates and qtbridge-\* crates
 
+## Supported platforms
+ - [x] osx
+ - [ ] windows (not planned)
+ - [ ] linux
+
+## Supported crates
+ - cxx-qt
+ - cxx-qt-lib
+ - qtbridge-type-lib
+ - qtbridge-runtime
+ - qtbridge-interfaces
+ - qtbridge
+
 ## Quickstart
 
 ### Add a dependency on cxx-qt-bazel:
@@ -62,6 +75,10 @@ bazel run //:refresh_project -- $(pwd)/third_party
  ```starlark
 include("//third_party:include.MODULE.bazel")
  ```
+
+## How it works
+
+TODO!
 
 ## Detailed usage 
 
