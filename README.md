@@ -15,6 +15,10 @@ cxx-qt-bazel is a wrapper on [cxx-qt](https://github.com/KDAB/cxx-qt) to enable 
  - qtbridge-interfaces
  - qtbridge
 
+## Planned features
+ - Cross compilation
+ - Resource handling
+
 ## Quickstart
 
 ### Add a dependency on cxx-qt-bazel:
