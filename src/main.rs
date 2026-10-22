@@ -7,6 +7,24 @@ fn main() {
     let mut args = Args::parse();
     std::fs::create_dir_all(&args.out_dir).unwrap();
 
+    let mut extra_include_dirs = Vec::new();
+
+    if let Some(header_path) = &args.extra_header_file {
+        std::fs::create_dir_all(header_path.parent().unwrap()).unwrap();
+        let mut file = std::fs::OpenOptions::new()
+            .create(true)
+            .truncate(true)
+            .write(true)
+            .open(header_path)
+            .unwrap();
+        writeln!(&mut file, "#pragma once").unwrap();
+        for line in &args.extra_header_line {
+            writeln!(&mut file, "{line}").unwrap();
+        }
+        file.sync_all().unwrap();
+        extra_include_dirs.push(header_path.parent().unwrap());
+    }
+
     unsafe {
         setup_env(&args);
     };
@@ -18,8 +36,6 @@ fn main() {
         .iter_mut()
         .for_each(|path| *path = pathx::relative_to(&args.crate_directory, path));
 
-    println!("{args:?}");
-
     let mut builder = if let Some(new_module) = args.new_qml_module {
         let mut module = QmlModule::new(new_module.as_str());
         module = module.qml_files(args.qml_file);
@@ -29,6 +45,10 @@ fn main() {
     };
 
     builder = builder.crate_include_root(args.crate_include_root);
+
+    for dir in extra_include_dirs {
+        builder = builder.include_dir(dir);
+    }
 
     for dir in args.out_include_dir {
         let dir = args.out_dir.join(dir);
@@ -46,6 +66,31 @@ fn main() {
         builder = builder.qt_module(&module);
     }
 
+    for initializer in args.initializer {
+        let (signature, path) = initializer.split_once(";").unwrap();
+
+        let path = pathx::relative_to(&args.crate_directory, Path::new(path));
+
+        builder = builder.initializer(qt_build_utils::Initializer {
+            file: Some(path),
+            ..qt_build_utils::Initializer::default_signature(signature)
+        });
+    }
+
+    builder = builder
+        .cpp_files(args.cpp_file)
+        .include_prefix(&include_prefix)
+        .files(args.file);
+
+    match args.command {
+        Command::Build => {
+            builder.build();
+        }
+        Command::Generate => {
+            builder.generate();
+        }
+    }
+
     if let Some(header_path) = &args.extra_header_file {
         std::fs::create_dir_all(header_path.parent().unwrap()).unwrap();
         let mut file = std::fs::OpenOptions::new()
@@ -59,36 +104,6 @@ fn main() {
             writeln!(&mut file, "{line}").unwrap();
         }
         file.sync_all().unwrap();
-        builder = builder.include_dir(header_path.parent().unwrap());
-    }
-
-    for initializer in args.initializer {
-        let (signature, path) = initializer.split_once(";").unwrap();
-
-        let path = pathx::relative_to(&args.crate_directory, Path::new(path));
-
-        builder = builder.initializer(qt_build_utils::Initializer {
-            file: Some(path),
-            ..qt_build_utils::Initializer::default_signature(signature)
-        });
-    }
-
-    let mut built = builder
-        .cpp_files(args.cpp_file)
-        .include_prefix(&include_prefix)
-        .files(args.file)
-        .build();
-
-    if let Some(command) = args.command {
-        match command {
-            Command::Export => built.export(),
-            Command::ReExport { lib } => {
-                for lib in lib {
-                    built = built.reexport_dependency(&lib)
-                }
-                built.export();
-            }
-        }
     }
 }
 
@@ -205,14 +220,11 @@ struct Args {
     qml_file: Vec<PathBuf>,
 
     #[command(subcommand)]
-    command: Option<Command>,
+    command: Command,
 }
 
 #[derive(Debug, Subcommand)]
 enum Command {
-    Export,
-    ReExport {
-        #[arg(long)]
-        lib: Vec<String>,
-    },
+    Build,
+    Generate,
 }

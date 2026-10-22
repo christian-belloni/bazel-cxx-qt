@@ -1,10 +1,7 @@
 load("@rules_cc//cc:find_cc_toolchain.bzl", "use_cc_toolchain")#, "find_cc_toolchain")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@bazel_skylib//rules/directory:providers.bzl", "DirectoryInfo")
-
-CxxQtInclude = provider("",
-  fields = ["include"]
-)
+load(":providers.bzl", "CxxQtInclude")
 
 def _cxx_qt_cmd_impl(ctx):
   out_lib = ctx.actions.declare_file("out/lib%s-cxxqt-generated.a" % ctx.attr.crate_name)
@@ -89,6 +86,7 @@ def _cxx_qt_cmd_impl(ctx):
     for f in qml_files:
       args.add("--qml-file", f)
 
+  args.add("build")
   ctx.actions.run(
     outputs = [out_lib, init_lib, cxx_header] + extra_headers,
     inputs = ctx.files.srcs + include_headers + additional_files + qt.glob(["**"]).to_list(),# + toolchain.all_files.to_list(),

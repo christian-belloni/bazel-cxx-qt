@@ -5,6 +5,7 @@ crate.annotation(
   additive_build_file = "//third_party:qt.additive.BUILD",
   extra_aliased_targets = {
     "_bs_cxx-qt-lib-generated": "_bs_cxx-qt-lib-generated",
+    "_bs_cxx-qt-lib": "_bs_cxx-qt-lib",
   },
   rustc_flags = ["--cfg", "cxxqt_qt_version_major=\"6\""],
   gen_build_script = "off",

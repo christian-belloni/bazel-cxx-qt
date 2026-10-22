@@ -1,4 +1,5 @@
 load("@cxx-qt-bazel//cxx-qt-bazel:cmd.bzl", "cxx_qt_cmd")
+load("@cxx-qt-bazel//cxx-qt-bazel:generate.bzl", generate = "cxx_qt_cmd")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 bridge_core_files = [
@@ -302,7 +303,48 @@ def cxx_qt_lib(*, name, features = [], cxx_qt, visibility = []):
     qt_modules.append("QuickControls2")
     linkopts.append("-framework QtQuick")
 
-  cxx_qt_cmd(
+  # cxx_qt_cmd(
+  #   name = name,
+  #   crate_name = "cxx-qt-lib",
+  #   srcs = native.glob(["include/**", "src/**", "Cargo.toml"], allow_empty = True),
+  #   cargo_toml = "Cargo.toml",
+  #   bridge_files = bridge_files,
+  #   cpp_files = cpp_files,
+  #   initializers = initializers,
+  #   cxxqt_dependency = [cxx_qt],
+  #   crate_include_root = "include",
+  #   crate_include_files = native.glob(["include/**"], allow_empty = True),
+  #   include_prefix = "private",
+  #   extra_headers = {
+  #     "include/cxx-qt-lib/definitions.h": extra_headers,
+  #   },
+  #   qt_modules = qt_modules,
+  #   qt = "@qt//:files",
+  #   visibility = visibility,
+  # )
+
+  cc_library(
+    name = name + "-generated",
+    srcs = [name] + cpp_files,
+    visibility = visibility,
+    linkstatic = True,
+    includes = [
+      "out/cxxqtbuild/include",
+      "out/include",
+    ],
+    deps = [
+      "@qt//:QtCore",  
+      "@qt//:QtQuick", 
+      "@qt//:QtQuickControls2", 
+      "@qt//:QtGui", 
+      "@qt//:QtQml",
+      "@qt//:QtNetwork",
+      "@qt//:qt_hdrs",
+      cxx_qt + "-generated"
+    ],
+  )
+
+  generate(
     name = name,
     crate_name = "cxx-qt-lib",
     srcs = native.glob(["include/**", "src/**", "Cargo.toml"], allow_empty = True),
@@ -315,19 +357,9 @@ def cxx_qt_lib(*, name, features = [], cxx_qt, visibility = []):
     crate_include_files = native.glob(["include/**"], allow_empty = True),
     include_prefix = "private",
     extra_headers = {
-      "include/cxx-qt-lib/definitions.h": extra_headers,
+      "definitions.h": extra_headers,
     },
     qt_modules = qt_modules,
     qt = "@qt//:files",
     visibility = visibility,
-  )
-
-  cc_library(
-    name = name + "-generated",
-    srcs = [name],
-    visibility = visibility,
-    additional_linker_inputs = ["@qt//:lib"],
-    linkopts = linkopts,
-    linkstatic = True,
-    deps = [name + "-hdrs"],
   )

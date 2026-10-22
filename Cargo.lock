@@ -304,7 +304,6 @@ dependencies = [
  "cxx-qt",
  "cxx-qt-build",
  "cxx-qt-lib",
- "dircpy",
  "pathx",
  "qt-build-utils",
  "qtbridge",
@@ -313,8 +312,7 @@ dependencies = [
 [[package]]
 name = "cxx-qt-build"
 version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bb2bb9e19b427e79ec5db1d88cde2f44f2d4190e5a0177e2d599ceb9277b670"
+source = "git+https://github.com/christian-belloni/cxx-qt.git#8847fb35dfb505c446a0805a25a51d4c6b4a7d4f"
 dependencies = [
  "cc",
  "codespan-reporting 0.11.1",
@@ -330,8 +328,7 @@ dependencies = [
 [[package]]
 name = "cxx-qt-gen"
 version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6de19cacc58672a9fb70fad66e3d62b6aeb4b2f323b6251aeb99b50c6b6aa0c"
+source = "git+https://github.com/christian-belloni/cxx-qt.git#8847fb35dfb505c446a0805a25a51d4c6b4a7d4f"
 dependencies = [
  "clang-format",
  "convert_case",
@@ -413,16 +410,6 @@ name = "deranged"
 version = "0.5.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e9de72ce2ad1f90dc62fa25f0f430ef85eb4b0d8fa0be4f30373bc40a21d28e"
-
-[[package]]
-name = "dircpy"
-version = "0.3.21"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "248c4c8c68170f1eb97d2dd60e0909ef81805478fc863790d37eb95258f5c3d1"
-dependencies = [
- "log",
- "walkdir",
-]
 
 [[package]]
 name = "displaydoc"
@@ -844,8 +831,7 @@ checksum = "d55d956fa96f5ec02be2e13af0e20391a5aa83d6a074e3ad368959d0fab299ea"
 [[package]]
 name = "qt-build-utils"
 version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c97911f105c362cbc035f631be7b43e44d9bca3a3aed2434260ba896f23d6b4"
+source = "git+https://github.com/christian-belloni/cxx-qt.git#8847fb35dfb505c446a0805a25a51d4c6b4a7d4f"
 dependencies = [
  "anyhow",
  "cc",
@@ -973,15 +959,6 @@ name = "rustversion"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
-
-[[package]]
-name = "same-file"
-version = "1.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
-dependencies = [
- "winapi-util",
-]
 
 [[package]]
 name = "scratch"
@@ -1221,16 +1198,6 @@ checksum = "7cc1186384beb7dd8eedea376413fd654937285ea6c9cfbb928dc3043ea4b606"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
-]
-
-[[package]]
-name = "walkdir"
-version = "2.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b"
-dependencies = [
- "same-file",
- "winapi-util",
 ]
 
 [[package]]

@@ -64,7 +64,7 @@ BASE_URL = "https://download.qt.io/online/qtsdkrepository/mac_x64/desktop"
 
 def _qt_download_impl(repo_ctx):
 
-  libs = ["QtCore", "QtTest", "QtQml", "QtGui", "QtNetwork", "QtQuickTest", "QtQuick"]
+  libs = ["QtCore", "QtTest", "QtQml", "QtGui", "QtNetwork", "QtQuickTest", "QtQuick", "QtQuickControls2"]
   
   templates = []
   for f in libs:
