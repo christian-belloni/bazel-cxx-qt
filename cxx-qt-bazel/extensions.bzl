@@ -1,10 +1,13 @@
-load(":repository.bzl", _qt_download = "qt_download")
+load(":repository.bzl","qt_download_osx", "qt_stdlib_alias")
 
 
 
 
 def _qt_download_impl(_mod_ctx):
-  _qt_download(
+  qt_download_osx(
+    name = "qt_osx",
+  )
+  qt_stdlib_alias(
     name = "qt",
   )
 

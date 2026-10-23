@@ -18,6 +18,22 @@ native_binary(
   visibility = ["//visibility:public"]
 )
 
+native_binary(
+  name = "rcc",
+  src = "libexec/rcc",
+  # data = glob(["**"]),
+  out = "rcc",
+  visibility = ["//visibility:public"]
+)
+
+native_binary(
+  name = "moc",
+  src = "libexec/moc",
+  # data = glob(["**"]),
+  out = "moc",
+  visibility = ["//visibility:public"]
+)
+
 exports_files(["lib", "include"])
 
 cc_library(
@@ -61,13 +77,13 @@ cc_library(
 """
 
 BASE_URL = "https://download.qt.io/online/qtsdkrepository/mac_x64/desktop"
+LIBS = ["QtCore", "QtTest", "QtQml", "QtGui", "QtNetwork", "QtQuickTest", "QtQuick", "QtQuickControls2"]
 
-def _qt_download_impl(repo_ctx):
+def _qt_download_osx_impl(repo_ctx):
 
-  libs = ["QtCore", "QtTest", "QtQml", "QtGui", "QtNetwork", "QtQuickTest", "QtQuick", "QtQuickControls2"]
   
   templates = []
-  for f in libs:
+  for f in LIBS:
     templates.append(LIB_TEMPLATE.format(framework = f))
   
   libs = "\n".join(templates)
@@ -108,8 +124,57 @@ def _qt_download_impl(repo_ctx):
   repo_ctx.file("BUILD.bazel", content = TEMPLATE.format(libs = libs))
 
 
-qt_download = repository_rule(
-  implementation = _qt_download_impl
+qt_download_osx = repository_rule(
+  implementation = _qt_download_osx_impl
+)
+
+ALIAS_TPL = """alias(
+  name = "files",
+  actual = "@qt_osx//:files"
+  visibility = ["//visibility:public"]
+)
+
+alias(
+  name = "qmake",
+  actual = "@qt_osx//:qmake"
+  visibility = ["//visibility:public"]
+)
+
+alias(
+  name = "lib",
+  actual = "@qt_osx//:lib",
+  visibility = ["//visibility:public"]
+)
+
+alias(
+  name = "include",
+  actual = "@qt_osx//:include",
+  visibility = ["//visibility:public"]
+)
+
+alias(
+  name = "qt_hdrs",
+  actual = "@qt_osx//:qt_hdrs",
+  visibility = ["//visibility:public"],
+)
+"""
+
+_TPL = """
+alias(
+  name = "{name}",
+  actual = "@qt_osx//:{name}",
+  visibility = ["//visibility:public"],
+)
+"""
+
+def _qt_stdlib_alias_impl(repo_ctx):
+  targets = ["qmake", "qt_hdrs", "include", "lib", "files"] + LIBS
+  tpl = [ _TPL.format(name = name) for name in targets ]
+  tpl = "\n".join(tpl)
+  repo_ctx.file("BUILD", content = tpl)
+
+qt_stdlib_alias = repository_rule(
+  implementation = _qt_stdlib_alias_impl
 )
 
 

@@ -113,9 +113,9 @@ checksum = "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04"
 
 [[package]]
 name = "cc"
-version = "1.9.0"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "877bf67ac8e52449eb2f9e98a344ea163beb70dd1f9eebe3cc5357dcfeaee4df"
+checksum = "86e055fa6e3e40ad6187ba25b6855eeb635d5271f8e0f0e1e9a5826b8d75bea0"
 dependencies = [
  "find-msvc-tools",
  "jobserver",
@@ -240,6 +240,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 
 [[package]]
+name = "current_platform"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a74858bcfe44b22016cb49337d7b6f04618c58e5dbfdef61b06b8c434324a0bc"
+
+[[package]]
 name = "cxx"
 version = "1.0.205"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -301,6 +307,7 @@ name = "cxx-qt-bazel"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "current_platform",
  "cxx-qt",
  "cxx-qt-build",
  "cxx-qt-lib",
@@ -312,7 +319,7 @@ dependencies = [
 [[package]]
 name = "cxx-qt-build"
 version = "0.10.0"
-source = "git+https://github.com/christian-belloni/cxx-qt.git#8847fb35dfb505c446a0805a25a51d4c6b4a7d4f"
+source = "git+https://github.com/christian-belloni/cxx-qt.git#77f5068a1389d9005bf26e0dfdc70abfae402b1d"
 dependencies = [
  "cc",
  "codespan-reporting 0.11.1",
@@ -328,7 +335,7 @@ dependencies = [
 [[package]]
 name = "cxx-qt-gen"
 version = "0.10.0"
-source = "git+https://github.com/christian-belloni/cxx-qt.git#8847fb35dfb505c446a0805a25a51d4c6b4a7d4f"
+source = "git+https://github.com/christian-belloni/cxx-qt.git#77f5068a1389d9005bf26e0dfdc70abfae402b1d"
 dependencies = [
  "clang-format",
  "convert_case",
@@ -831,7 +838,7 @@ checksum = "d55d956fa96f5ec02be2e13af0e20391a5aa83d6a074e3ad368959d0fab299ea"
 [[package]]
 name = "qt-build-utils"
 version = "0.10.0"
-source = "git+https://github.com/christian-belloni/cxx-qt.git#8847fb35dfb505c446a0805a25a51d4c6b4a7d4f"
+source = "git+https://github.com/christian-belloni/cxx-qt.git#77f5068a1389d9005bf26e0dfdc70abfae402b1d"
 dependencies = [
  "anyhow",
  "cc",
@@ -1192,9 +1199,9 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 
 [[package]]
 name = "uuid"
-version = "1.28.0"
+version = "1.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7cc1186384beb7dd8eedea376413fd654937285ea6c9cfbb928dc3043ea4b606"
+checksum = "4a0e2d11620c50695fe12bbbfde96b3477fe606e7284c22d505c12ce51214514"
 dependencies = [
  "js-sys",
  "wasm-bindgen",

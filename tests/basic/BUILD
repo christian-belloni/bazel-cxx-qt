@@ -3,19 +3,19 @@ load("@cxx-qt-bazel//cxx-qt-bazel:qml_module.bzl", "qml_module")
 load("@cxx_qt_crates//:defs.bzl", "all_crate_deps")
 
 qml_module(
-  name = "_gen",
+  name = "main_qml",
   crate_name = "basic",
-  module_name = "com.example.basic",
-  qml_files = [
-    "qml/main.qml",
-  ],
+  modules = {
+    "ui": glob(["qml/main.qml"]),
+    "components": glob(["qml/nested/Other.qml"]),
+  },
 )
 
 rust_binary(
   name = "basic",
   srcs = ["src/main.rs"],
   deps = all_crate_deps() + [
-    ":_gen",
+    "main_qml",
     # we are using Quick in qml
     "@qt//:QtQuick",
   ],

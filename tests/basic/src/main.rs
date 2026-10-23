@@ -14,6 +14,6 @@ impl Backend {
 fn main() {
     QApp::new()
         .register::<Backend>()
-        .load_qml_from_file("qrc:/qt/qml/com/example/basic/qml/main.qml")
+        .load_qml_from_file("qrc:/qt/qml/ui/qml/main.qml")
         .run();
 }

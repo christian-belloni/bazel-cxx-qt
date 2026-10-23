@@ -51,4 +51,8 @@ include("//third_party:qtbridge-interfaces.MODULE.bazel")
 
 qt_download = use_extension("@cxx-qt-bazel//cxx-qt-bazel:extensions.bzl", "qt_download")
 
-use_repo(qt_download, "qt")
+use_repo(qt_download, "qt", "qt_osx")
+
+register_toolchains(
+  "//toolchains:all",
+)

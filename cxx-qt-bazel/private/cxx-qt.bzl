@@ -1,19 +1,6 @@
-load("@cxx-qt-bazel//cxx-qt-bazel:cmd.bzl", "cxx_qt_cmd")
 load("@cxx-qt-bazel//cxx-qt-bazel:generate.bzl", generate = "cxx_qt_cmd")
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 def cxx_qt(*, name, visibility = []):  
-  cc_library(
-    name = name + "-generated",
-    srcs = [name] + ["src/connection.cpp"],
-    visibility = visibility,
-    includes = [
-      "out/cxxqtbuild/include",
-      "out/include",
-    ],
-    deps = ["@qt//:QtCore", "@qt//:QtQuick", "@qt//:QtQuickControls2"]
-  )
-
   generate(
     name = name,
     crate_name = "cxx-qt",
@@ -26,6 +13,6 @@ def cxx_qt(*, name, visibility = []):
     initializers = {
       "init_cxx_qt_core": "src/init.cpp"
     },
-    qt = "@qt//:files",
     visibility = visibility,
+    qt_modules = ["Core", "Quick", "QuickControls2"]
   )

@@ -17,7 +17,6 @@ fn main() {
             .write(true)
             .open(header_path)
             .unwrap();
-        writeln!(&mut file, "#pragma once").unwrap();
         for line in &args.extra_header_line {
             writeln!(&mut file, "{line}").unwrap();
         }
@@ -44,26 +43,10 @@ fn main() {
         CxxQtBuilder::new()
     };
 
-    builder = builder.crate_include_root(args.crate_include_root);
-
-    for dir in extra_include_dirs {
-        builder = builder.include_dir(dir);
-    }
-
-    for dir in args.out_include_dir {
-        let dir = args.out_dir.join(dir);
-        println!("out_include_dir: {}", dir.display());
-        builder = builder.include_dir(&dir);
-    }
-
     let include_prefix = args.include_prefix.unwrap_or(args.crate_name.clone());
 
     for qrc in args.qrc {
         builder = builder.qrc(qrc);
-    }
-
-    for module in args.qt_module {
-        builder = builder.qt_module(&module);
     }
 
     for initializer in args.initializer {
@@ -77,10 +60,7 @@ fn main() {
         });
     }
 
-    builder = builder
-        .cpp_files(args.cpp_file)
-        .include_prefix(&include_prefix)
-        .files(args.file);
+    builder = builder.include_prefix(&include_prefix).files(args.file);
 
     match args.command {
         Command::Build => {
@@ -110,32 +90,15 @@ fn main() {
 unsafe fn setup_env(args: &Args) {
     let out_dir = &args.out_dir.canonicalize().unwrap();
 
-    println!("{}", out_dir.display());
-
-    let mut current = std::env::var("CXXFLAGS").unwrap_or_default();
-
-    for dependency in &args.cxxqt_dependency {
-        current.push_str(&format!(
-            " -I {}",
-            dependency.canonicalize().unwrap().display()
-        ));
-    }
-
     unsafe {
-        if let Ok(cxx) = std::env::var("CXX") {
-            let cxx = PathBuf::from(cxx).canonicalize().unwrap();
-            std::env::set_var("CXX", cxx);
-        }
-
-        std::env::set_var("CXXFLAGS", current);
         std::env::set_var("OUT_DIR", out_dir);
         std::env::set_var("QMAKE", args.qmake.canonicalize().unwrap());
         std::env::set_var("QT_VERSION_MAJOR", "6");
 
         std::fs::create_dir_all(&args.out_dir).unwrap();
-        std::env::set_var("TARGET", &args.target_triple);
-        std::env::set_var("HOST", &args.host_triple);
-        std::env::set_var("OPT_LEVEL", args.opt_level.to_string());
+        std::env::set_var("TARGET", current_platform::CURRENT_PLATFORM);
+        std::env::set_var("HOST", current_platform::CURRENT_PLATFORM);
+        std::env::set_var("OPT_LEVEL", "3");
 
         let absolute = args.crate_directory.canonicalize().unwrap();
         std::env::set_var("CARGO_MANIFEST_DIR", &absolute);
@@ -145,12 +108,6 @@ unsafe fn setup_env(args: &Args) {
             std::env::current_dir().unwrap().display()
         );
         std::env::set_var("CARGO_PKG_NAME", &args.crate_name);
-
-        if let Some(links) = &args.cargo_manifest_links {
-            std::env::set_var("CARGO_MANIFEST_LINKS", links);
-        } else {
-            std::env::set_var("CARGO_MANIFEST_LINKS", &args.crate_name);
-        }
     };
 }
 
@@ -187,15 +144,6 @@ struct Args {
     qmake: PathBuf,
 
     #[arg(long)]
-    host_triple: String,
-
-    #[arg(long)]
-    target_triple: String,
-
-    #[arg(long)]
-    opt_level: u8,
-
-    #[arg(long)]
     crate_directory: PathBuf,
 
     #[arg(long)]
@@ -209,9 +157,6 @@ struct Args {
 
     #[arg(long)]
     extra_header_line: Vec<String>,
-
-    #[arg(long)]
-    cxxqt_dependency: Vec<PathBuf>,
 
     #[arg(long)]
     new_qml_module: Option<String>,

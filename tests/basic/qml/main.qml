@@ -3,6 +3,9 @@ import QtQuick.Controls
 import QtQuick.Window
 import basic
 
+import ui
+import components
+
 ApplicationWindow {
     id: root
     height: 480
@@ -14,5 +17,8 @@ ApplicationWindow {
         anchors.centerIn: parent
         text: "Hello World!"
         onClicked: Backend.say_hello()
+    }
+    Other {
+      text: "<b>Hello</b> <i>World!</i>"
     }
 }

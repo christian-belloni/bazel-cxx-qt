@@ -24,7 +24,7 @@ def build_scripts(*, prefix, visibility = [], crates_hub = "@crates", rustconv =
   qtbridge_type_lib(
     name = prefix + "_qtbridge_type_lib", 
     visibility = visibility, 
-    cxx_qt_lib = crates_hub + "//:" + prefix + "_cxx-qt-lib-generated",
+    cxx_qt_lib = crates_hub + "//:" + prefix + "_cxx-qt-lib",
     rustconv_lbl = rustconv,
   )
   qtbridge_runtime(

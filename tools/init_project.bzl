@@ -38,22 +38,21 @@ crate.annotation(
   additive_build_file = "//third_party:qt.additive.BUILD",
   extra_aliased_targets = {{
     "{prefix}_cxx-qt": "{prefix}_cxx-qt",
-    "{prefix}_cxx-qt-generated": "{prefix}_cxx-qt-generated",
   }},
   rustc_flags = ["--cfg", "cxxqt_qt_version_major=\\"6\\""],
   gen_build_script = "off",
-  link_deps = ["@{crates_hub}//:{prefix}_cxx-qt-generated"],
+  link_deps = ["@{crates_hub}//:{prefix}_cxx-qt"],
 )
 
 crate.annotation(
   crate = "cxx-qt-lib",
   additive_build_file = "//third_party:qt.additive.BUILD",
   extra_aliased_targets = {{
-    "{prefix}_cxx-qt-lib-generated": "{prefix}_cxx-qt-lib-generated",
+    "{prefix}_cxx-qt-lib": "{prefix}_cxx-qt-lib",
   }},
   rustc_flags = ["--cfg", "cxxqt_qt_version_major=\\"6\\""],
   gen_build_script = "off",
-  link_deps = ["@{crates_hub}//:{prefix}_cxx-qt-lib-generated"],
+  link_deps = ["@{crates_hub}//:{prefix}_cxx-qt-lib"],
 )
 
 crate.annotation(
